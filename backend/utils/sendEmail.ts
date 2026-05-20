@@ -1,11 +1,16 @@
-import SendGrid from '@sendgrid/mail'
-import { SUPPORT_EMAIL } from '@utils/constants/random'
+import { Resend } from 'resend'
+import { EMAIL_FROM } from '@utils/constants/random'
 
-SendGrid.setApiKey(process.env.SENDGRID_API_KEY as string)
+const resend = new Resend(process.env.RESEND_API_KEY as string)
 
 const sendEmail = async (to: string, subject: string, html: string) => {
   try {
-    await SendGrid.send({ from: SUPPORT_EMAIL, to, subject, html })
+    const { error } = await resend.emails.send({ from: EMAIL_FROM, to, subject, html })
+
+    if (error) {
+      console.error(error)
+      return false
+    }
   } catch (err) {
     console.error(err)
     return false
